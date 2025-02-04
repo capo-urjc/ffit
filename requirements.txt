@@ -1,0 +1,7 @@
+dearpygui==1.10.1
+dearpygui-ext==0.9.5
+numpy==1.26.2
+Pillow==10.1.0
+tqdm==4.66.1
+screeninfo~=0.8.1
+pyserial~=3.5
