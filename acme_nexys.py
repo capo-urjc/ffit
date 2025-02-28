@@ -18,7 +18,7 @@ def get_ebd_filename():
 
 
 def adjust_coords(input_coords):
-    bounds = [[3, 8], [19, 27], [28, 87],                                # Clock region X0
+    bounds = [[3, 18], [19, 27], [28, 87],                               # Clock region X0
               [88, 93], [94, 107], [108, 118], [119, 127], [128, 145]]   # Clock region X1
 
     offsets = [0, 1, 2, 3, 4, 5, 6, 7]
