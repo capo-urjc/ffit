@@ -5,7 +5,6 @@ from fpga_data import fpgas
 
 ebd_full_path = ""
 
-
 def create_left_window():
     coords_inputs = []
     with dpg.group(horizontal=True):
@@ -97,7 +96,6 @@ def manual_clamp_yhi_callback(sender, value, user_data):
 
 
 def gen_addrs_callback(sender, value, user_data):
-    from acme import generate_injection_addresses
     coords = {"X_Lo": dpg.get_value(user_data[0]), "Y_Lo": dpg.get_value(user_data[1]),
               "X_Hi": dpg.get_value(user_data[2]), "Y_Hi": dpg.get_value(user_data[3])}
     with open(ebd_full_path, "r") as file:
@@ -106,7 +104,12 @@ def gen_addrs_callback(sender, value, user_data):
         with dpg.group(horizontal=True):
             dpg.add_loading_indicator(pos=[10, 20])
             dpg.add_text("Generating injection addresses...", pos=[100, 42])
-    result = generate_injection_addresses(ebd_file_lines, coords, "KCU105")
+    if dpg.get_value("fpga_desp") == "KCU105":
+        from acme import generate_injection_addresses
+        result = generate_injection_addresses(ebd_file_lines, coords, "KCU105")
+    elif dpg.get_value("fpga_desp") == "Nexys4":
+        from acme_nexys import generate_injection_addresses
+        result = generate_injection_addresses(ebd_file_lines, coords, "Nexys4")
     injection_file_path = ebd_full_path[:ebd_full_path.rfind("\\")] + "\\injection_addresses.txt"
     print(injection_file_path)
     with open(injection_file_path, "w") as file:
