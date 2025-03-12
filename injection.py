@@ -20,10 +20,14 @@ def check_ready(input):
                   chr(13), chr(73), chr(62), chr(32)]  # O> I \n SC 00 \n I>
     i_buffer_2 = [chr(83), chr(67), chr(32), chr(49), chr(48), chr(13), chr(83), chr(67), chr(32), chr(48), chr(48),
                   chr(13), chr(73), chr(62), chr(32)]  # SC 10 \n SC 00 \n I>
+    i_buffer_1_2 = [chr(13), chr(79), chr(62), chr(32), chr(73), chr(13), chr(83), chr(67), chr(32), chr(48), chr(48),
+                  chr(13), chr(73), chr(62), '']  # O> I \n SC 00 \n I>
+    i_buffer_2_2 = [chr(83), chr(67), chr(32), chr(49), chr(48), chr(13), chr(83), chr(67), chr(32), chr(48), chr(48),
+                  chr(13), chr(73), chr(62), '']  # SC 10 \n SC 00 \n I>
     ready_buffer = [chr(70), chr(67), chr(32), chr(52), chr(48), chr(13), chr(83), chr(67), chr(32), chr(48), chr(50),
                     chr(13), chr(79), chr(62), chr(32)]  # FC 40 \n SC 02 \n O>
     return list(input) == ready_buffer or list(input) == first_o_buffer or list(input) == i_buffer_1 \
-        or list(input) == i_buffer_2
+                or list(input) == i_buffer_2 or list(input) == i_buffer_1_2 or list(input) == i_buffer_2_2
 
 
 output_buffer = collections.deque(maxlen=15)
