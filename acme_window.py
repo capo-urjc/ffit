@@ -5,10 +5,10 @@ from fpga_data import fpgas
 
 ebd_full_path = ""
 
-def create_left_window():
+def create_address_window():
     coords_inputs = []
     with dpg.group(horizontal=True):
-        dpg.add_button(label="Load file...", tag="load_ebd_file", callback=select_file)
+        dpg.add_button(label="Load EDB file...", tag="load_ebd_file", callback=select_file)
         dpg.add_text(tag="ebd_filename_text")
     with dpg.group(horizontal=True):
         dpg.add_text("Select FPGA")
@@ -35,13 +35,19 @@ def create_left_window():
                                        callback=manual_clamp_yhi_callback, user_data=coords_inputs)
         coords_inputs.append(y_hi_input)
     with dpg.group(horizontal=True):
+        dpg.add_text("Injection Strategy [WIP]")
+        #types = ["Statistical", "Accumulated", "Multiple Bit Upset", "Patterns", "Bit-Flip"]
+        strategies = ["Exhaustive", "Random", "Module-Specific", "Pattern-Based"]
+        dpg.add_combo([strategy for strategy in strategies], width=230, tag="type_desp")#, callback=update_coords, user_data=coords_inputs)
+
+    with dpg.group(horizontal=True):
         dpg.add_button(label="Generate addresses", callback=gen_addrs_callback, user_data=coords_inputs)
         dpg.add_button(label="Calculate V_ENABLETIME", indent=660, callback=calculate_venabletime)
 
 
 def select_file(sender, app_data):
     with dpg.file_dialog(directory_selector=False, show=True, height=600, callback=file_selected):
-        dpg.add_file_extension(".ebd", color=(0, 255, 0, 255))
+        dpg.add_file_extension(".ebd", color=(30, 140, 30, 255))
 
 
 def file_selected(sender, value, user_data):
