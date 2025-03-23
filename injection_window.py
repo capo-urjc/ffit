@@ -10,7 +10,7 @@ design_port = SerialPort()
 
 def select_file(sender, app_data):
     with dpg.file_dialog(directory_selector=False, show=True, height=600, callback=file_selected):
-        dpg.add_file_extension(".txt", color=(0, 255, 0, 255))
+        dpg.add_file_extension(".txt", color=(30, 140, 30, 255))
 
 
 def file_selected(sender, value, user_data):
@@ -38,20 +38,27 @@ def update_ports_callback(sender, value, user_data):
 
 
 def remove_port_descrip(user_data):
-    user_data[0].set_serial_name(user_data[0].get_serial_name().split("-")[0][:-1])
-    user_data[1].set_serial_name(user_data[1].get_serial_name().split("-")[0][:-1])
-    return user_data
+    try:
+        user_data[0].set_serial_name(user_data[0].get_serial_name().split("-")[0][:-1])
+        user_data[1].set_serial_name(user_data[1].get_serial_name().split("-")[0][:-1])
+        return user_data
+    except:
+        return False
 
 
 def injection_callback(sender, value, user_data):
-    dpg.set_item_label("inject_btn", "Launched")
+
     user_data = remove_port_descrip(user_data)
-    launch_injection(injection_full_path, user_data)
+    if user_data:
+        dpg.set_item_label("inject_btn", "Launched")
+        launch_injection(injection_full_path, user_data)
+    else:
+        dpg.set_value("log", "Please, select a valid SEM IP Port and Design Port!")
 
 
-def create_right_window():
+def create_injection_window():
     with dpg.group(horizontal=True):
-        dpg.add_button(label="Load file...", tag="load_addr_file", callback=select_file)
+        dpg.add_button(label="Load address file...", tag="load_addr_file", callback=select_file)
         dpg.add_text(tag="addr_filename_text")
     dpg.add_spacer(height=10)
     with dpg.group(horizontal=True):
@@ -65,14 +72,14 @@ def create_right_window():
         dpg.add_text("SEM IP Port")
         dpg.add_spacer()
         ports = com_ports()
-        dpg.add_combo([p.name + " - " + p.description for p in ports], width=300, tag="sem_port_cb", callback=set_port_name_callback,
+        dpg.add_combo([p.name + " - " + p.description for p in ports], width=400, tag="sem_port_cb", callback=set_port_name_callback,
                       user_data=sem_port)
     with dpg.group(horizontal=True):
         dpg.add_text("Design Port")
         dpg.add_spacer(width=7)
         ports = com_ports()
 
-        dpg.add_combo([p.name + " - " + p.description for p in ports], width=300, tag="design_port_cb", callback=set_port_name_callback,
+        dpg.add_combo([p.name + " - " + p.description for p in ports], width=400, tag="design_port_cb", callback=set_port_name_callback,
                       user_data=design_port)
     dpg.add_spacer(height=10)
     with dpg.group(horizontal=True):

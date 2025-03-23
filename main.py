@@ -4,8 +4,10 @@ from dearpygui_ext import themes
 from screeninfo import get_monitors
 from serial_port import SerialPort
 
-from acme_window import create_left_window
-from injection_window import create_right_window
+from acme_window import create_address_window
+from injection_window import create_injection_window
+
+from v_enable import calculate_venabletime
 
 screen_resolution = 0
 
@@ -54,12 +56,12 @@ def add_title():
         authors_y = title_y + 10
     else:
         text_offset = resolution.width // 2 - 45  # 950
-        authors_offset = -200
+        authors_offset = -300
         title_y = 25
         authors_y = title_y + 30
-    dpg.add_text("ACME", pos=(text_offset, title_y))
+    dpg.add_text("FPGA Fault Injection Tool", pos=(text_offset-110, title_y))
     dpg.bind_item_font(dpg.last_item(), "ttf-font-big")
-    dpg.add_text("Francisco Jose Garcia-Espinosa, Luis Alberto Aranda",
+    dpg.add_text("Francisco Jose Garcia-Espinosa, Diego Hortelano, Luis Alberto Aranda",
                  pos=(text_offset + authors_offset, authors_y))
     dpg.bind_item_font(dpg.last_item(), "ttf-font-small")
     header_logos()
@@ -92,20 +94,56 @@ def create_main_window(window_name="Window"):
     with dpg.window(label=window_name, tag=window_name):
         add_title()
         if screen_resolution < 1080:
-            pos = (5, 100)
+            pos = (10, 100)
         else:
-            pos = (5, 120)
-        with dpg.group(tag="windows_group", pos=pos):
-            width_widget_window = 950
-            height_widget_window = 750
-            with dpg.child_window(width=width_widget_window, height=height_widget_window):
-                create_left_window()
-            with dpg.child_window(width=width_widget_window, height=height_widget_window, pos=[width_widget_window + 10, pos[1]]):
-                create_right_window()
-            height_log_window = 190
-            with dpg.child_window(width=width_widget_window * 2 + 5, height=height_log_window, pos=[pos[0], height_widget_window + pos[1] + 10]):
-                log = dpg.add_text("", tag="log")
-                dpg.bind_item_font(log, "ttf-font-big")
+            pos = (10, 120)
+        with dpg.child_window(border=False, pos=pos):
+            with dpg.tab_bar(tag="tab_bar_general"):
+                initial_x_pos = 0
+                initial_y_pos = 50
+                space_between_elements = 10
+                width_widget_half_window = 940
+                with dpg.tab(label="Fault Injection"):  # First tab, focused on Fault Injection
+                    with dpg.group(tag="windows_group_fault_injection", pos=(initial_x_pos, initial_y_pos)):
+                        height_configuration_window = 290
+                        height_log_window = 190
+                        height_completion_window = 90
+                        height_graph_window = 550
+                        with dpg.child_window(width=width_widget_half_window, height=height_configuration_window, pos=(initial_x_pos, initial_y_pos)):
+                            create_injection_window()
+
+                        with dpg.child_window(width=width_widget_half_window, height=height_log_window, pos=(initial_x_pos, height_configuration_window + initial_y_pos + space_between_elements)):
+                            log = dpg.add_text("", tag="log")
+                            dpg.bind_item_font(log, "ttf-font-big")
+
+                        with dpg.child_window(width=width_widget_half_window, height=height_completion_window, pos=(width_widget_half_window + space_between_elements, initial_y_pos)):
+                            with dpg.group(horizontal=True):
+                                dpg.add_text("Completed Injections:", pos=(10,10))
+                                dpg.add_progress_bar(tag="progress_bar", default_value=0.0, width=300, height=25, pos=(10,50))
+                                dpg.add_text("0.00%", tag="progress_text", pos=(120, 45))
+                                dpg.add_text("Injections not Launched", tag="time_text", pos=(450, 10))
+                                dpg.add_text("", tag="errors_text", pos=(450, 45))
+
+                        with dpg.child_window(width=width_widget_half_window, height=height_graph_window, pos=(width_widget_half_window + space_between_elements, initial_y_pos + height_completion_window + space_between_elements)):
+                            with dpg.plot(label="Percentage of Output Errors caused by Fault Injections", tag="plot", height=530, width=-1):
+                                dpg.add_plot_axis(dpg.mvXAxis, label="Number of Injections", tag="x_axis", no_tick_labels=False)
+                                with dpg.plot_axis(dpg.mvYAxis, label="Output Errors (%)", tag="y_axis"):
+                                    dpg.set_axis_limits("y_axis", 0, 100)  # 0-100%
+                                    dpg.add_scatter_series([], [], label="Fault Rate", tag="plot_series", parent="y_axis")
+
+                with dpg.tab(label="Address Generation", tag="tab_address"):   # Second tab, with functions to obtain injection addresses
+                    with dpg.group(tag="windows_group_address_generation", pos=(initial_x_pos, initial_y_pos)):
+                        height_widget_window = 500
+                        with dpg.child_window(width=width_widget_half_window, height=height_widget_window):
+                            create_address_window()
+
+                with dpg.tab(label="Support Tools", tag="tab_tools"):  # Third tab, with utils related with the fault injection
+                    with dpg.group(tag="windows_group_tools", pos=(initial_x_pos, initial_y_pos)):
+                        height_widget_window = 500
+                        with dpg.child_window(width=width_widget_half_window, height=height_widget_window):
+                            dpg.add_button(label="Calculate V_ENABLETIME", callback=calculate_venabletime)
+
+    dpg.set_value("tab_bar_general", "tab_address")
     dpg.set_primary_window(window_name, True)
 
 

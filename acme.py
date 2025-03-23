@@ -253,10 +253,10 @@ def ebd_translate(lines, frames, words, clock_regions):
                                 wd_bt = hex((m << 5) + n)[2:].zfill(3)
                                 addr = f"C{(la + wd_bt).zfill(9)}\n".upper()
                                 addresses.append(addr)
-                    curr_line += 1
+                curr_line += 1
     return addresses
-                        
-                        
+
+
 def generate_injection_addresses(ebd_lines, coords, board):
     coords = adjust_coords(coords)
     frames, words, clock_regions = get_frames(board, coords)
