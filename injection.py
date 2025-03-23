@@ -76,7 +76,7 @@ def sem_ip_uart_read(uart, done_write, log_file_path):
                 print(byte, end="", flush=True)
                 file.write(byte)
         elif list(output_buffer) == incorrectible:
-            dpg.set_value("log", dpg.get_value("log") + "Incorrectible error, restart the FPGA")
+            dpg.set_value("log", dpg.get_value("log") + "Uncorrectible error, restart the FPGA")
             output_buffer.clear()
             waiting = 0
         else:  # to timeout faulty injections
@@ -228,8 +228,13 @@ def launch_injection(injection_addresses, user_data):
 
     injection_done = False
     w_finished = False
-    with open(injection_addresses, "r") as file:
-        addresses = file.readlines()
+
+    try:
+        with open(injection_addresses, "r") as file:
+            addresses = file.readlines()
+    except FileNotFoundError:
+        dpg.set_value("log", "Address file not found. Please, select a valid address (.txt) file.")
+        return
 
     sem_log_file_path = "sem.txt"
     out_log_file_path = "out.txt"

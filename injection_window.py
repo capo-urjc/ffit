@@ -38,15 +38,22 @@ def update_ports_callback(sender, value, user_data):
 
 
 def remove_port_descrip(user_data):
-    user_data[0].set_serial_name(user_data[0].get_serial_name().split("-")[0][:-1])
-    user_data[1].set_serial_name(user_data[1].get_serial_name().split("-")[0][:-1])
-    return user_data
+    try:
+        user_data[0].set_serial_name(user_data[0].get_serial_name().split("-")[0][:-1])
+        user_data[1].set_serial_name(user_data[1].get_serial_name().split("-")[0][:-1])
+        return user_data
+    except:
+        return False
 
 
 def injection_callback(sender, value, user_data):
-    dpg.set_item_label("inject_btn", "Launched")
+
     user_data = remove_port_descrip(user_data)
-    launch_injection(injection_full_path, user_data)
+    if user_data:
+        dpg.set_item_label("inject_btn", "Launched")
+        launch_injection(injection_full_path, user_data)
+    else:
+        dpg.set_value("log", "Please, select a valid SEM IP Port and Design Port!")
 
 
 def create_injection_window():

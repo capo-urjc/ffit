@@ -7,6 +7,8 @@ from serial_port import SerialPort
 from acme_window import create_address_window
 from injection_window import create_injection_window
 
+from v_enable import calculate_venabletime
+
 screen_resolution = 0
 
 
@@ -134,6 +136,13 @@ def create_main_window(window_name="Window"):
                         height_widget_window = 500
                         with dpg.child_window(width=width_widget_half_window, height=height_widget_window):
                             create_address_window()
+
+                with dpg.tab(label="Support Tools", tag="tab_tools"):  # Third tab, with utils related with the fault injection
+                    with dpg.group(tag="windows_group_tools", pos=(initial_x_pos, initial_y_pos)):
+                        height_widget_window = 500
+                        with dpg.child_window(width=width_widget_half_window, height=height_widget_window):
+                            dpg.add_button(label="Calculate V_ENABLETIME", callback=calculate_venabletime)
+
     dpg.set_value("tab_bar_general", "tab_address")
     dpg.set_primary_window(window_name, True)
 
